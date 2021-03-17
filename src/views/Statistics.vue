@@ -24,6 +24,8 @@ import {
 import {
   CanvasRenderer
 } from 'echarts/renderers';
+import {getReq, postReq} from "@/api/request";
+
 echarts.use([LineChart, TitleComponent, TooltipComponent, GridComponent, CanvasRenderer])
 
 var dayRequestDataList = []
@@ -33,8 +35,7 @@ var dayCnt
 
 export default {
   name: 'Statistic',
-  components: {
-  },
+  components: {},
   data() {
     return {
       currentDay: this.moment().format('YYYY-MM-DD'),
@@ -53,8 +54,8 @@ export default {
     latestReqCnt = echarts.init(document.getElementById("latest-req-cnt"))
 
     // day count
-    this.dayRequestCount()
-    this.hourRequestCount()
+    // this.dayRequestCount()
+    // this.hourRequestCount()
   },
   methods: {
     // 停止实时请求
@@ -76,14 +77,14 @@ export default {
         series: [{
           name: '请求量',
           type: 'line',
+          smooth: true,
           data: dayRequestDataList.map(a => a.count)
         }]
       })
     },
     latestRequestCount() {
       let _this = this
-      this.axios.get('http://localhost:8128/statistic/website/latestSecondRequest?second=3').then(resp => {
-        let result = resp.data
+      getReq('statistic/website/latestSecondRequest', {second: 3}, false).then(result => {
         if (result.code === 1) {
           _this.renderDayRequestCount(result.data)
           _this.dayRequestId = setTimeout(function () {
@@ -100,8 +101,7 @@ export default {
         endTime: this.moment().format('YYYY-MM-DD'),
         format: TimeCondition.format_hour
       }
-      this.axios.post('http://localhost:8128/statistic/website/requestCountInTime', param).then(resp => {
-        let result = resp.data
+      postReq('/statistic/website/requestCountInTime', param).then(result => {
         if (result.code === 1) {
           console.log(JSON.stringify(result.data))
           let resultList = result.data
@@ -115,6 +115,7 @@ export default {
             series: [{
               name: '请求量',
               type: 'line',
+              smooth: true,
               data: resultList.map(a => a.value)
             }]
           })
@@ -127,8 +128,7 @@ export default {
         endTime: this.moment().format('YYYY-MM-DD'),
         format: TimeCondition.format_day
       }
-      this.axios.post('http://localhost:8128/statistic/website/requestCountInTime', param).then(resp => {
-        let result = resp.data
+      postReq('/statistic/website/requestCountInTime', param).then(result => {
         if (result.code === 1) {
           console.log(JSON.stringify(result.data))
           let resultList = result.data
@@ -142,6 +142,7 @@ export default {
             series: [{
               name: '请求量',
               type: 'line',
+              smooth: true,
               data: resultList.map(a => a.value)
             }]
           })
