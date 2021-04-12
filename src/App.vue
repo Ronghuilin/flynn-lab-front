@@ -5,6 +5,7 @@
         <a-avatar shape="square"
                   src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2464689086,3627478003&fm=26&gp=0.jpg"/>
         <span style="font-weight: bold; margin-left: 5px">Flynn-Lab</span>
+        <span v-show="onlineUserCount > 0">在线：{{onlineUserCount}}</span>
       </a-menu-item>
       <a-menu-item :key="pages.blog.key">
         <a-icon type="appstore"/>
@@ -37,6 +38,9 @@
 <script>
 export default {
   components: {},
+  created() {
+    this.getOnlineCount()
+  },
   data() {
     return {
       pages: {
@@ -62,6 +66,7 @@ export default {
         },
       },
       current: ['statistics'],
+      onlineUserCount: 0,
     }
   },
   methods: {
@@ -73,6 +78,11 @@ export default {
       let page = this.pages[key]
       console.log(page)
       this.$router.replace(page.path)
+    },
+    getOnlineCount() {
+      this.getReq('/statistic/server/getOnlineUserCount').then(resp => {
+        this.onlineUserCount = resp.data
+      })
     }
   }
 }

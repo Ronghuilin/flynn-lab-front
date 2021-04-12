@@ -5,16 +5,17 @@ import router from './router'
 import moment from 'moment'
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
-import {initEnv, env, getReq, postReq} from './api/request.js'
+import {env, getReq, initEnv, postReq} from './api/request.js'
 
 Vue.config.productionTip = false
-initEnv(env.prod)
+initEnv(env.dev)
 
 
 Vue.use(Antd)
 Vue.use(Vuex)
-Vue.use(getReq)
-Vue.use(postReq)
+
+Vue.prototype.getReq=getReq
+Vue.prototype.postReq=postReq
 
 Vue.prototype.moment = moment
 Vue.prototype.store = new Vuex.Store({

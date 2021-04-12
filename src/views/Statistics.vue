@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h3>this is a statistic page</h3>
+    <h3>This is a statistic page</h3>
     <div>
       <div id="latest-req-cnt" style="width: 360px; height: 240px;display: inline-block "></div>
       <div id="day-cnt" style="width: 360px; height: 240px; display: inline-block"></div>
@@ -15,15 +15,9 @@
 import {TimeCondition} from '../api/enum.js'
 import * as echarts from 'echarts/core';
 import {LineChart} from 'echarts/charts'
-import {
-  TitleComponent,
-  TooltipComponent,
-  GridComponent
-} from 'echarts/components';
+import {GridComponent, TitleComponent, TooltipComponent} from 'echarts/components';
 // 引入 Canvas 渲染器，注意引入 CanvasRenderer 或者 SVGRenderer 是必须的一步
-import {
-  CanvasRenderer
-} from 'echarts/renderers';
+import {CanvasRenderer} from 'echarts/renderers';
 import {getReq, postReq} from "@/api/request";
 
 echarts.use([LineChart, TitleComponent, TooltipComponent, GridComponent, CanvasRenderer])
@@ -38,7 +32,7 @@ export default {
   components: {},
   data() {
     return {
-      currentDay: this.moment().format('YYYY-MM-DD'),
+      currentDay: this.$moment().format('YYYY-MM-DD'),
       serverInfo: null,
       dayRequestId: null,
       dayCntList: [],
@@ -68,7 +62,7 @@ export default {
         // 移除第一个
         dayRequestDataList.splice(0, 1)
       }
-      dayRequestDataList.push({time: this.moment().format('mm:ss'), count: num})
+      dayRequestDataList.push({time: this.$moment().format('mm:ss'), count: num})
       latestReqCnt.setOption({
         xAxis: {
           data: dayRequestDataList.map(a => a.time)
@@ -85,11 +79,13 @@ export default {
     latestRequestCount() {
       let _this = this
       getReq('statistic/website/latestSecondRequest', {second: 3}, false).then(result => {
-        if (result.code === 1) {
+        if (result && result.code === 1) {
           _this.renderDayRequestCount(result.data)
           _this.dayRequestId = setTimeout(function () {
             _this.latestRequestCount()
           }, 3000)
+        } else {
+          console.log('result=', result)
         }
       })
     },
@@ -97,12 +93,12 @@ export default {
     },
     hourRequestCount() {
       let param = {
-        startTime: this.moment().subtract(30, "day").format('YYYY-MM-DD'),
-        endTime: this.moment().format('YYYY-MM-DD'),
+        startTime: this.$moment().subtract(30, "day").format('YYYY-MM-DD'),
+        endTime: this.$moment().format('YYYY-MM-DD'),
         format: TimeCondition.format_hour
       }
       postReq('/statistic/website/requestCountInTime', param).then(result => {
-        if (result.code === 1) {
+        if (result && result.code === 1) {
           console.log(JSON.stringify(result.data))
           let resultList = result.data
           hourCnt = echarts.init(document.getElementById("hour-cnt"))
@@ -119,13 +115,15 @@ export default {
               data: resultList.map(a => a.value)
             }]
           })
+        } else {
+          console.log('result=', result)
         }
       })
     },
     dayRequestCount() {
       let param = {
-        startTime: this.moment().subtract(7, "day").format('YYYY-MM-DD'),
-        endTime: this.moment().format('YYYY-MM-DD'),
+        startTime: this.$moment().subtract(7, "day").format('YYYY-MM-DD'),
+        endTime: this.$moment().format('YYYY-MM-DD'),
         format: TimeCondition.format_day
       }
       postReq('/statistic/website/requestCountInTime', param).then(result => {

@@ -48,7 +48,7 @@ export const env = {
         host: 'http://localhost:8128'
     },
     prod: {
-        host: 'http://127.0.0.1:8128'
+        host: 'http://vm0.local:8128'
     }
 }
 
